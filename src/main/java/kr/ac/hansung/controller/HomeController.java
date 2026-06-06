@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -14,6 +15,13 @@ public class HomeController {
     @GetMapping("/")
     public String root() {
         return "redirect:/home";
+    }
+
+    // 권한 부족(AccessDeniedException) 시 forward되는 커스텀 403 페이지 (footer 포함).
+    // forward는 원 요청 메서드(GET/POST)를 유지하므로 @RequestMapping으로 모든 메서드를 받는다.
+    @RequestMapping("/access-denied")
+    public String accessDenied() {
+        return "access-denied";
     }
 
     @GetMapping("/home")

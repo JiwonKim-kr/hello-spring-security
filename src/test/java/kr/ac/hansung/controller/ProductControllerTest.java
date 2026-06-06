@@ -209,7 +209,8 @@ class ProductControllerTest {
     @DisplayName("일반 USER - 상품 수정 폼 접근 시 403 (관리자 전용)")
     void editForm_user_returns403() throws Exception {
         mockMvc.perform(get("/products/1/edit"))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isForbidden())
+            .andExpect(forwardedUrl("/access-denied"));
     }
 
     @Test
@@ -221,6 +222,7 @@ class ProductControllerTest {
                 .param("name", "수정 시도")
                 .param("price", "10000")
                 .param("stock", "5"))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isForbidden())
+            .andExpect(forwardedUrl("/access-denied"));
     }
 }

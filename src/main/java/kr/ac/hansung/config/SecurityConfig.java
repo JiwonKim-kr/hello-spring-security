@@ -49,6 +49,8 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID")
                 .permitAll()
             )
+            // 권한 부족 시 기본 Whitelabel 403 대신 footer(일시·학번·성명)가 있는 커스텀 페이지로 forward
+            .exceptionHandling(ex -> ex.accessDeniedPage("/access-denied"))
             .userDetailsService(userDetailsService);
 
         return http.build();
