@@ -156,4 +156,51 @@ class ProductControllerTest {
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/products"));
     }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("ADMIN - 상품 수정 폼 조회 성공 (200) + 기존값 pre-fill")
+    void editForm_admin_returns200() throws Exception {
+        given(productService.findById(1L)).willReturn(
+            new Product("수정대상 상품", 10000, "설명", 5)
+        );
+
+        mockMvc.perform(get("/products/1/edit"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("products/edit"))
+            .andExpect(model().attributeExists("product"))
+            .andExpect(model().attribute("productId", 1L));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("ADMIN - 상품 수정 POST 후 목록으로 리다이렉트")
+    void editProduct_admin_redirectsToList() throws Exception {
+        given(productService.updateProduct(eq(1L), any())).willReturn(
+            new Product("수정된 상품", 20000, "수정 설명", 10)
+        );
+
+        mockMvc.perform(post("/products/1/edit")
+                .with(csrf())
+                .param("name", "수정된 상품")
+                .param("price", "20000")
+                .param("stock", "10")
+                .param("description", "수정 설명"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/products"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("ADMIN - 상품 수정 검증 실패(상품명 공백) 시 폼으로 복귀 (200)")
+    void editProduct_validationError_returnsForm() throws Exception {
+        mockMvc.perform(post("/products/1/edit")
+                .with(csrf())
+                .param("name", "")
+                .param("price", "20000")
+                .param("stock", "10"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("products/edit"))
+            .andExpect(model().attributeHasFieldErrors("product", "name"));
+    }
 }

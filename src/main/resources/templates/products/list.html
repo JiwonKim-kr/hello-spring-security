@@ -45,6 +45,11 @@
 </nav>
 
 <div class="container">
+    <!-- 수정/등록 등 성공 메시지 (flash) -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="page-header">
             <h4 class="fw-bold mb-0">상품 목록</h4>
@@ -111,10 +116,14 @@
                             <td class="text-center text-muted small"
                                 th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd')}"></td>
                             <td class="text-center" sec:authorize="hasRole('ADMIN')">
-                                <form th:action="@{/products/{id}/delete(id=${p.id})}" method="post"
-                                      onsubmit="return confirm('삭제하시겠습니까?')">
-                                    <button class="btn btn-outline-danger btn-sm">삭제</button>
-                                </form>
+                                <div class="d-flex gap-1 justify-content-center">
+                                    <a th:href="@{/products/{id}/edit(id=${p.id})}"
+                                       class="btn btn-outline-primary btn-sm">수정</a>
+                                    <form th:action="@{/products/{id}/delete(id=${p.id})}" method="post"
+                                          onsubmit="return confirm('삭제하시겠습니까?')">
+                                        <button class="btn btn-outline-danger btn-sm">삭제</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     </tbody>

@@ -45,6 +45,18 @@ public class ProductService {
     }
 
     @Transactional
+    public Product updateProduct(Long id, ProductDto dto) {
+        // 영속 상태 엔티티 조회 후 필드만 변경 → @Transactional 종료 시 더티 체킹으로 UPDATE (save() 호출 없음)
+        Product product = productRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("상품을 찾을 수 없습니다: " + id));
+        product.setName(dto.getName());
+        product.setPrice(dto.getPrice());
+        product.setStock(dto.getStock());
+        product.setDescription(dto.getDescription());
+        return product;
+    }
+
+    @Transactional
     public void deleteById(Long id) {
         productRepository.deleteById(id);
     }
