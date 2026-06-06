@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.NoSuchElementException;
 
 @Service
@@ -17,8 +19,9 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     @Transactional(readOnly = true)
-    public List<Product> findAll() {
-        return productRepository.findAll();
+    public Page<Product> getProducts(Pageable pageable) {
+        // 페이징 처리된 전체 상품 조회 (JpaRepository가 제공하는 findAll(Pageable))
+        return productRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)

@@ -48,7 +48,10 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="page-header">
             <h4 class="fw-bold mb-0">상품 목록</h4>
-            <small class="text-muted">총 <span th:text="${#lists.size(products)}"></span>개 상품</small>
+            <small class="text-muted">
+                총 <span th:text="${productPage.totalElements}">0</span>개 상품
+                (<span th:text="${productPage.number + 1}">1</span> / <span th:text="${productPage.totalPages}">1</span> 페이지)
+            </small>
         </div>
         <a th:href="@{/products/add}" class="btn btn-danger btn-sm px-4 fw-semibold"
            sec:authorize="hasRole('ADMIN')">+ 상품 등록</a>
@@ -56,10 +59,10 @@
 
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
-            <div th:if="${#lists.isEmpty(products)}" class="text-center py-5 text-muted">
+            <div th:if="${productPage.isEmpty()}" class="text-center py-5 text-muted">
                 <p class="mb-0">등록된 상품이 없습니다.</p>
             </div>
-            <div th:unless="${#lists.isEmpty(products)}" class="table-responsive">
+            <div th:unless="${productPage.isEmpty()}" class="table-responsive">
                 <table class="table table-hover mb-0 align-middle">
                     <thead>
                         <tr>
@@ -73,7 +76,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="p : ${products}">
+                        <tr th:each="p : ${productPage.content}">
                             <td class="ps-4 text-muted small" th:text="${p.id}"></td>
                             <td>
                                 <a th:href="@{/products/{id}(id=${p.id})}"
@@ -104,6 +107,29 @@
             </div>
         </div>
     </div>
+
+    <!-- 페이지네이션 (Bootstrap) -->
+    <nav class="mt-4" th:if="${productPage.totalPages > 0}" aria-label="상품 목록 페이지">
+        <ul class="pagination justify-content-center">
+            <!-- 이전 페이지 -->
+            <li class="page-item" th:classappend="${!productPage.hasPrevious()} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/products(page=${productPage.number - 1}, size=${productPage.size})}">이전</a>
+            </li>
+            <!-- 페이지 번호 (0-based → 화면에는 i+1, 현재 페이지는 active) -->
+            <li th:each="i : ${#numbers.sequence(0, productPage.totalPages - 1)}"
+                class="page-item" th:classappend="${i == productPage.number} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/products(page=${i}, size=${productPage.size})}"
+                   th:text="${i + 1}">1</a>
+            </li>
+            <!-- 다음 페이지 -->
+            <li class="page-item" th:classappend="${!productPage.hasNext()} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/products(page=${productPage.number + 1}, size=${productPage.size})}">다음</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
