@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  공통 footer 프래그먼트 — 과제 3.1 [필수 요구사항]
+  모든 웹페이지 하단에 "실습 수행 일시(실시간) · 학번 · 성명"을 고정 표시한다.
+  - #temporals.createNow() : 페이지가 렌더링되는 현재 시각(LocalDateTime)
+  - 화면 어디서든 항상 보이도록 position:fixed 하단 고정, body 하단 패딩으로 본문 가림 방지
+  사용법: <div th:replace="~{fragments/footer :: siteFooter}"></div>
+-->
+<th:block th:fragment="siteFooter">
+    <style>
+        body { padding-bottom: 3.4rem; }
+    </style>
+    <footer class="text-center py-2 px-3"
+            style="position:fixed; left:0; right:0; bottom:0; z-index:1030;
+                   background:#0f3460; color:#fff; font-size:.78rem; letter-spacing:.2px;
+                   box-shadow:0 -2px 10px rgba(0,0,0,.2);">
+        <span th:text="${'실습 수행 일시: ' + #temporals.format(#temporals.createNow(), 'yyyy-MM-dd HH:mm:ss')}">실습 수행 일시</span>
+        <span class="mx-2 opacity-50">|</span>학번&nbsp;2171020
+        <span class="mx-2 opacity-50">|</span>성명&nbsp;김지원
+    </footer>
+</th:block>
+</body>
+</html>
