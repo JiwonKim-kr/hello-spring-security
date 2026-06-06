@@ -203,4 +203,24 @@ class ProductControllerTest {
             .andExpect(view().name("products/edit"))
             .andExpect(model().attributeHasFieldErrors("product", "name"));
     }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    @DisplayName("일반 USER - 상품 수정 폼 접근 시 403 (관리자 전용)")
+    void editForm_user_returns403() throws Exception {
+        mockMvc.perform(get("/products/1/edit"))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    @DisplayName("일반 USER - 상품 수정 POST 시 403 (관리자 전용)")
+    void editProduct_user_returns403() throws Exception {
+        mockMvc.perform(post("/products/1/edit")
+                .with(csrf())
+                .param("name", "수정 시도")
+                .param("price", "10000")
+                .param("stock", "5"))
+            .andExpect(status().isForbidden());
+    }
 }
