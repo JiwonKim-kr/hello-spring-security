@@ -57,10 +57,25 @@
            sec:authorize="hasRole('ADMIN')">+ 상품 등록</a>
     </div>
 
+    <!-- 검색 폼 (GET, 검색어 유지) -->
+    <form th:action="@{/products}" method="get" class="row g-2 mb-3">
+        <div class="col">
+            <input type="text" name="keyword" class="form-control"
+                   placeholder="상품명으로 검색" th:value="${keyword}"/>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary px-4">검색</button>
+            <a th:href="@{/products}" class="btn btn-outline-secondary">초기화</a>
+        </div>
+    </form>
+
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             <div th:if="${productPage.isEmpty()}" class="text-center py-5 text-muted">
-                <p class="mb-0">등록된 상품이 없습니다.</p>
+                <p class="mb-0" th:if="${keyword != null}">
+                    '<span th:text="${keyword}"></span>' 검색 결과가 없습니다.
+                </p>
+                <p class="mb-0" th:if="${keyword == null}">등록된 상품이 없습니다.</p>
             </div>
             <div th:unless="${productPage.isEmpty()}" class="table-responsive">
                 <table class="table table-hover mb-0 align-middle">
@@ -111,22 +126,28 @@
     <!-- 페이지네이션 (Bootstrap) -->
     <nav class="mt-4" th:if="${productPage.totalPages > 0}" aria-label="상품 목록 페이지">
         <ul class="pagination justify-content-center">
-            <!-- 이전 페이지 -->
+            <!-- 이전 페이지 (검색 중이면 keyword 유지) -->
             <li class="page-item" th:classappend="${!productPage.hasPrevious()} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{/products(page=${productPage.number - 1}, size=${productPage.size})}">이전</a>
+                   th:href="${keyword != null}
+                            ? @{/products(page=${productPage.number - 1}, size=${productPage.size}, keyword=${keyword})}
+                            : @{/products(page=${productPage.number - 1}, size=${productPage.size})}">이전</a>
             </li>
             <!-- 페이지 번호 (0-based → 화면에는 i+1, 현재 페이지는 active) -->
             <li th:each="i : ${#numbers.sequence(0, productPage.totalPages - 1)}"
                 class="page-item" th:classappend="${i == productPage.number} ? 'active'">
                 <a class="page-link"
-                   th:href="@{/products(page=${i}, size=${productPage.size})}"
+                   th:href="${keyword != null}
+                            ? @{/products(page=${i}, size=${productPage.size}, keyword=${keyword})}
+                            : @{/products(page=${i}, size=${productPage.size})}"
                    th:text="${i + 1}">1</a>
             </li>
-            <!-- 다음 페이지 -->
+            <!-- 다음 페이지 (검색 중이면 keyword 유지) -->
             <li class="page-item" th:classappend="${!productPage.hasNext()} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{/products(page=${productPage.number + 1}, size=${productPage.size})}">다음</a>
+                   th:href="${keyword != null}
+                            ? @{/products(page=${productPage.number + 1}, size=${productPage.size}, keyword=${keyword})}
+                            : @{/products(page=${productPage.number + 1}, size=${productPage.size})}">다음</a>
             </li>
         </ul>
     </nav>

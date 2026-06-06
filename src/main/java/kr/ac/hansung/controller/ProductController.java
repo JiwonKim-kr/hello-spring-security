@@ -21,13 +21,22 @@ public class ProductController {
 
     @GetMapping
     public String list(
+            @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             Model model) {
         // URL 파라미터(page, size)로 페이지 요청 생성, id 기준 정렬
         Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
-        Page<Product> productPage = productService.getProducts(pageable);
+
+        // 빈 문자열("")은 null로 정규화 → 검색/전체 분기 및 Thymeleaf URL 처리에 사용
+        String normalizedKeyword = (keyword != null && !keyword.isBlank()) ? keyword : null;
+
+        Page<Product> productPage = (normalizedKeyword != null)
+                ? productService.searchProducts(normalizedKeyword, pageable)
+                : productService.getProducts(pageable);
+
         model.addAttribute("productPage", productPage);
+        model.addAttribute("keyword", normalizedKeyword);
         return "products/list";
     }
 

@@ -25,6 +25,12 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    public Page<Product> searchProducts(String keyword, Pageable pageable) {
+        // 상품명 키워드 검색 + 페이징 (@Query LIKE)
+        return productRepository.findByNameContaining(keyword, pageable);
+    }
+
+    @Transactional(readOnly = true)
     public Product findById(Long id) {
         return productRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("상품을 찾을 수 없습니다: " + id));

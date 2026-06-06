@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -66,6 +67,25 @@ class ProductControllerTest {
             .andExpect(status().isOk())
             .andExpect(view().name("products/list"))
             .andExpect(model().attributeExists("productPage"));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    @DisplayName("인증된 사용자 - 키워드 검색 시 searchProducts 호출 + keyword 모델 전달")
+    void listProducts_withKeyword_callsSearch() throws Exception {
+        given(productService.searchProducts(eq("애플"), any())).willReturn(
+            new PageImpl<>(
+                List.of(new Product("애플 맥북 프로 M4", 2990000, "M4 칩", 0)),
+                PageRequest.of(0, 5), 1)
+        );
+
+        mockMvc.perform(get("/products").param("keyword", "애플"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("products/list"))
+            .andExpect(model().attributeExists("productPage"))
+            .andExpect(model().attribute("keyword", "애플"));
+
+        then(productService).should().searchProducts(eq("애플"), any());
     }
 
     @Test
