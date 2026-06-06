@@ -44,6 +44,11 @@
 </nav>
 
 <div class="container">
+    <!-- 비밀번호 변경 등 성공 메시지 (flash) -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     <!-- Welcome Card -->
     <div class="welcome-card p-4 mb-4">
         <h4 class="fw-bold mb-1">환영합니다!</h4>
